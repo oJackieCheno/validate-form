@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <link rel="stylesheet" type="text/css" href="bannerocity.css" />
+    <title>
+        Bannerocity-Personalized Online Sky Banners
+    </title>
+</head>
+
+<body>
+    <div class="image">
+        <img id="logo" src="images/logo.png" alt="Bannerocity" />
+    </div>
+
+    <form name="orderform" action="bannerocity.php" method="POST">
+
+        <table>
+            <tr>
+                <th rowspan="2">Enter the banner message:</th>
+                <td>
+                    <!--访问表单中的数据，首先要区分域。表单域有两种识别方式，第一种是ID-独一无二的识别网页元素，利用getElementById()方式可访问网页上任意元素。
+                    第二种是name属性-独一无二的识别表单中的域。每个表单都有一个form对象，是一个数组，负责存储表单中所有域。但它的数组元素并非利用数值索引，而是利用域独有的name属性标识符。
+                    这种方式更简单，更针对表单设计。syntax: form["objectname"],这样可以访问表单对象，加上value特性form["objectname"].value就可以访问域值。-->
+
+                    <input id="message" type="text" name="message" autofocus size="32" onblur="validateLength(1,32,this,document.getElementById('message_help'))">
+                    <!--对函数validateLength()声明了四个变量-->
+
+                    <!--autofocus:When present, it specifies that an <input> element should automatically get focus when the page loads.
+                    也可在body标签中声明：onload="document.getElementById('message').focus()"来实现.
+                    The focus() method is used to give focus to an element (if it can be focused)-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="message_help" class="help"></span>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Enter ZIP code of the location:</th>
+                <td>
+                    <input id="zipcode" type="text" name="zipcode" size="5" onblur="validateZipCode(this,document.getElementById('zipcode_help'))">
+
+                    <!--关键词this：引用表单本身，通过把表单域当成对象传送给验证函数，提供函数访问表单域值，以及访问（存储所有表单域）form的机会。
+                    this.form出现在表单域的onblur代码中时，其实它用于引用表单对象本身，而this.form["objectname"]则是对表单对象数组中name为objectname的表单域进行访问，
+                    也可以用getElementById()，但利用表单方式比较便捷
+                    The value of this, when used in a function, is the object that "owns" the function.
+                    The value of this, when used in an object, is the object itself.-->
+
+                    <!--在这里，传给函数validateZipCode()的有两个变量，一个事this-指代包含它的表单域，第二个是document.getElementById('zipcode_help')-->
+
+                    <!--onblur与onfocus是相反事件，onfocus实在表单域取得输入焦点时出发，onblur在域失去焦点时触发。与其类似的有onchange: 失去焦点并且输入内容被改变时触发。
+                        在验证表单时onblur更合适，因为对于空白表格，失去焦点时不会触发onchange。onchange更适合用于编辑数据并另外存储表单-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="zipcode_help" class="help"></span>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Enter the date for the message to be shown:</th>
+                <td>
+                    <input id="date" type="text" name="date" size="10" onblur="validateDate(this,document.getElementById('date_help'))">
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="date_help" class="help"></span>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Enter your name:</th>
+                <td>
+                    <input id="name" type="text" name="name" size="32" onblur="validateNonEmpty(this,document.getElementById('name_help'))">
+                    <!--这里辅助信息名字name_help是在表单域名字name后加上—_help,这只是一种惯例，在表单域与它的辅助信息元素间建立清楚的链接-->
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="name_help" class="help"></span>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Enter your phone number:</th>
+                <td>
+                    <input id="phone" type="text" name="phone" size="12" onblur="validatePhone(this,document.getElementById('phone_help'))">
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="phone_help" class="help"></span>
+                </td>
+            </tr>
+            <tr>
+                <th rowspan="2">Enter your email address:</th>
+                <td>
+                    <input id="email" type="text" name="email" size="32" onblur="validateEmail(this,document.getElementById('email_help'))">
+                    <!--size属性表示这个域在页面上显示的尺寸只能装下多少字符，但并不限制输入字符的长短-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span id="email_help" class="help"></span>
+                </td>
+            </tr>
+        </table>
+        <div id="button">
+            <button type="button" value="Order Banner" onclick="placeOrder(this.form)">Order Banner</button>
+            <!--this.form用于访问整个表单对象-->
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        function validateRegExp(regexp, inputStr, helpText, helpMessage) {
+            /*四个变量，来自于引用它的函数声明*/
+            // See if the input data validates OK
+            if (!regexp.test(inputStr)) { //第一个变量regexp是正则表达式，正则表达式的test()方法用来检测一段string与该正则表达式规定的模式是否相匹配，匹配返回true
+                // The data is invalid, so set the help message and return false
+                if (helpText != null) {
+                    helpText.innerHTML = helpMessage;
+                    return false;
+                }
+            } else { //这个else语句是跟第一个if语句"if(isNaN()) {}"并列，所以一定要注意放在第一个if语句结束的大括号之外，而不是第二个if语句"if(helpText!=null) {}"结束的大括号之外
+                // The data is OK, so clear the help message and return true
+                if (helpText != null) {
+                    helpText.innerHTML = "";
+                    return true;
+                }
+            }
+        }
+
+        /*正则表达式：1.必须以斜线"/"起始与结束。
+        2.正则表达式不是字符串，只能用于字符串。
+        3.如果相匹配元字符，比如/$/,需要用反斜线"\"转义成/\$/.其他有特殊意义的字符，处理方法类似。
+        4.正则表达式由RegExp对象表示，RegExp对象的text()方法用于检查字符串是否包含正则表达式模式。
+        5.建立正则表达式：比如：var regexp = /^\d{5}$/ 或者 var regexp = new RegExp("^\d{5}$") ,第一种方法直接创建正则表达式的对象字面量，这个字面量会自动创建RegExp对象，
+        正则表达式通常建立为literal字面量，所以很少见RegExp这个对象。
+        6.如果要测试输入表单域的值，则可以 if (!regexp.test(inputField.value)) {},不匹配，test()返回false，!test()则是true，if执行*/
+
+        /*元字符(metacharacter):链接字母与数字，创建高度描述性的文本模式
+        1. ".":匹配任何字符，换行符除外
+        2. "\d":匹配任何数字字符
+        3. "\w":匹配任何数字或者字母字符
+        4. "\s":匹配空格：包括空白字符，换行符，
+        5. "^":被匹配的字符串需要以该模式开始，即字符串开头不能有其他文字，必须以规定的模式开始，比如两个字符串："cat22"和"2cat2",模式为/^cat/,则第一个以cat开始的字符串匹配成功。
+        6. "$": 被匹配的字符串需要以该模式结尾，即字符串结尾不能有其他文字，必须以规定的模式结束，比如两个字符串："cat22"和"22cat",模式为/^\d/,则第一个以数字结束的字符串匹配成功
+        7. "|": 表示选替，指定一连串可供选择子模式，只要一个子模式匹配成功，则模式匹配成功：/(red|blue|yellow) flower/表示red flower, blue flower和yellow flower都符合*/
+
+        /*限定符(quantifier):限定符前面是它所规定的子模式，限定符应用在自模式，控制子模式出现在模式里的次数。
+         1. "*":前方的子模式可选，可出现任意次数，即子模式出现0次或多次：/ \w* /表示匹配任何字母数字，包括空字符
+         2. "+": 子模式必须出现，出现任意次数，即出现一次或多次：/.+/表示匹配任何字符，其出现至少一次，用于匹配非空字符
+         3. "?": 子模式出现0次或1次：/(HOT)? ? Donuts/可匹配出HOT Donuts或者Donuts
+         4. "{n}": 子模式必须恰好出现n次
+         5. "()": 集合字符和/或元字符，使它们成为一个子模式
+         6. "{min,max}": 子模式出现次数在min与max之间，包括min与max，比如： /\d{2,4}/ 表示2-4个数字都匹配成功*/
+
+        function validateNonEmpty(inputField, helpText) {
+            // See if the input value contains any text
+            return validateRegExp(/.+/, inputField.value, helpText, "Please enter a value.");
+            //引用validateRegExp()函数，声明四个变量，第一个变量(/.+/)是正则表达式，在这里正则表达式规定的模式pattern是任意不为空的字符串，如果表单域输入值不是空，返回true。
+        }
+
+        function validateLength(minLength, maxLength, inputField, helpText) {
+            // See if the input value contains at least minLength but no more than maxLength characters
+            return validateRegExp(new RegExp("^.{" + minLength + "," + maxLength + "}$"), inputField.value, helpText,
+                    "Please enter a value " + minLength + " to " + maxLength + " characters in length.")
+                /*在这里，第一个变量是正则表达式，它可以不创建RegExp对象，直接用用字面量的方法声明: validateRegExp(/^.{1,32}$/,inputField.value,helpText)；
+                也可以去掉minLength和maxLength，直接用数字代替：validateRegExp(new RegExp("^.{1,32}$"),inputField.value) ; 此时，用引号代替斜线包裹正则表达式模式。
+                其中{min,max}是限定符，指定子模式出现在字符串里最少与最大次数，比如某些密码限定5-8字符，用这个正合适：/^\w{5,8}$/。*/
+        }
+        //引用validateRegExp()函数，第一个变量是正则表达式另一种声明方法，
+
+        function validateZipCode(inputField, helpText) {
+            // First see if the input value contains data
+            if (!validateNonEmpty(inputField, helpText)) {
+                return false;
+            } else {
+                // Then see if the input value is a ZIP code
+                return validateRegExp(/^\d{5}$/, inputField.value, helpText, "Please enter a 5-digit ZIP code.")
+            }
+        }
+
+
+        function validateDate(inputField, helpText) {
+            // First see if the input value contains data
+            if (!validateNonEmpty(inputField, helpText)) {
+                return false;
+            } else {
+                // Then see if the input value is a date
+                return validateRegExp(/^\d{2}\/\d{2}\/(\d{2}|\d{4})$/, inputField.value, helpText, "Please enter a data(for example:01/04/1991)")
+            } //对日期验证，日期格式是##/##/####,其中的斜线在正则表达式里有特殊意义，需要反斜线\转义。
+            /*"|"是选替元字符，指定一连串可供选择的子模式，只要有一个字模式匹配成功，则算模式匹配成功。比如：/^\d{2}\/\d{2}\/(\d{2}|\d{4})$/，表示可供匹配的模式有：
+            ##/##/#### 或者 ##/##/##  */
+        }
+
+        function validatePhone(inputField, helpText) {
+            if (!validateNonEmpty(inputField, helpText)) {
+                return false;
+            } else {
+                return validateRegExp(/^\d{3}-\d{3}-\d{4}$/, inputField.value, helpText, "Please enter a phone number (for example:123-456-7890")
+            }
+        }
+
+        function validateEmail(inputField, helpText) {
+            if (!validateNonEmpty(inputField, helpText)) {
+                return false;
+            } else {
+                return validateRegExp(/^[\w\.\-_\+]+@[\w\-]+(\.\w{2,4})+$/, inputField.value, helpText, "Please enter an email address for example(john123@gmail.com)");
+            }
+        }
+
+        /*邮箱的正则表达式比较复杂：[\w\.\-_\+]是一个字符类，用于合并一些选用字符到子模式里面，用方括号包裹，括号内每一个列出的字符
+        都是合格的字符匹配目标，可建立可替换的子模式列表，但是，字符类的结果都是对单一字符的匹配，除非字符后面加上限定符，比如"+". 
+        比如：/d[iu]g/,结果是"dig"或者"dug",不会出现"diug", 但是如果是/d[iu]+g/,这里有一个"+"限定符，表示前面的字符类可以出现1次或多次，所以结果会出现: "duuiiiuuuug"等，
+        如果没有"+"，则字符内里面的可选字符只能选择其中一个出现.
+        
+        (\.\w{2,4})+$:这个不是字符类，()表示把括号里的所有字符当成一个子模式，后面的"+"则是表示这个子模式可以重复1次或多次，但是每重复一次，按照".\w{2,4}"的顺序出现一次，
+        即括号内的元素都必须按顺序出现一次，这一点与字符类不同(字符类是[]内的所有字符其中一个出现,而不是都出现一次),"\."中的"\"是对"."的转义，
+        "\w{2,4}"表示这个子模式每出现一次，则数字或字符出现2-4次，后面的"$"表示邮箱的模式必须以这个子模式结束*/
+
+        function placeOrder(form) {
+            /*提交订单的时候让然需要验证表单，防止用户便要求填写就提交表单*/
+            /*自变量form来自于引用placeOrder()函数的表单域中在函数括号内对自变量的声明，在这里form=this.form即指表单本身，
+            此时form["message"]即是通过数组方法访问表单对象中的name为"message"的表单域*/
+            if (validateLength(1, 32, form["message"], form["message_help"]) &&
+                validateZipCode(form["zipcode"], form["zipcode_help"]) &&
+                validateDate(form["date"], form["date_help"]) &&
+                validateNonEmpty(form["name"], form["name_help"]) &&
+                validatePhone(form["phone"], form["phone_help"]) &&
+                validateEmail(form["email"], form["email_help"])) {
+                // Submit the order to the server
+                form.submit(); //所有表单域都通过验证，则通过submit()方法送出表单给服务器
+            } else {
+                alert("I'm sorry but there is something wrong with the order information.");
+            }
+        }
+    </script>
+</body>
+
+</html>

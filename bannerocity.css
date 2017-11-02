@@ -1,0 +1,29 @@
+.image {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#button {
+    text-align: center;
+}
+
+th {
+    text-align: left;
+    padding: 5px;
+}
+
+table {
+    margin: 50px auto;
+    margin-bottom: 30px;
+}
+
+body {
+    font-family: arial, "Times New Roman", Times, serif;
+    font-size: medium;
+    margin: 0px;
+}
+
+span.help {
+    color: #660000;
+    font-style: italic;
+}
